@@ -22,6 +22,7 @@ FROM debian:buster
 ARG IMAGE_ARG
 # arg that specifies the bazel version to install
 ARG BAZEL_VERSION_ARG=0.23.1
+ARG KIND_VERSION_ARG=0.6.1
 
 # add envs:
 # - so we can debug with the image name:tag
@@ -33,7 +34,8 @@ ENV IMAGE=${IMAGE_ARG} \
     BAZEL_VERSION=${BAZEL_VERSION_ARG} \
     PATH=/google-cloud-sdk/bin:${PATH} \
     CLOUDSDK_CORE_DISABLE_PROMPTS=1 \
-    CONTAINER=docker
+    CONTAINER=docker \
+    KIND_VERSION=${KIND_VERSION_ARG}
 
 # copy in image utility scripts
 COPY ["wrapper.sh", "create_bazel_cache_rcs.sh", "install-bazel.sh", \
@@ -72,16 +74,16 @@ RUN echo "Installing Packages ..." \
     && rm -rf /var/lib/apt/lists/* \
     && echo "Installing Bazel ..." \
     && install-bazel.sh \
-    && echo "Installing gcloud SDK, kubectl ..." \
-    && curl https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz --output google-cloud-sdk.tar.gz \
-    && tar xzf google-cloud-sdk.tar.gz -C / \
-    && rm google-cloud-sdk.tar.gz \
-    && /google-cloud-sdk/install.sh \
-        --disable-installation-options \
-        --bash-completion=false \
-        --path-update=false \
-        --usage-reporting=false \
-    && gcloud components install kubectl \
+    && echo "Installing kubectl" \
+    && curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl \
+    && chmod +x ./kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl \
+    && kubectl version \
+    && echo "Installing kind" \
+    && curl -LO https://github.com/kubernetes-sigs/kind/releases/download/v$KIND_VERSION/kind-linux-amd64 \
+    && chmod +x kind-linux-amd64 \
+    && mv kind-linux-amd64 /usr/local/bin/kind \
+    && kind version \
     && echo "Installing Docker ..." \
     && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - \
     && add-apt-repository \
@@ -94,6 +96,19 @@ RUN echo "Installing Packages ..." \
     && echo "Ensuring Legacy Iptables ..." \
     && update-alternatives --set iptables /usr/sbin/iptables-legacy \
     && update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
+
+#     && echo "Installing gcloud SDK, kubectl ..." \
+#    && curl https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz --output google-cloud-sdk.tar.gz \
+#    && tar xzf google-cloud-sdk.tar.gz -C / \
+#    && rm google-cloud-sdk.tar.gz \
+#    && /google-cloud-sdk/install.sh \
+#        --disable-installation-options \
+#        --bash-completion=false \
+#        --path-update=false \
+#        --usage-reporting=false \
+#    && gcloud components install kubectl \
+
 
 # entrypoint is our wrapper script, in Prow you will need to explicitly re-specify this
 ENTRYPOINT ["wrapper.sh"]
