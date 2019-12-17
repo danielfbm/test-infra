@@ -78,7 +78,7 @@ RUN echo "Installing Packages ..." \
     && curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl \
     && chmod +x ./kubectl \
     && mv ./kubectl /usr/local/bin/kubectl \
-    && kubectl version \
+    && kubectl help \
     && echo "Installing kind" \
     && curl -LO https://github.com/kubernetes-sigs/kind/releases/download/v$KIND_VERSION/kind-linux-amd64 \
     && chmod +x kind-linux-amd64 \
