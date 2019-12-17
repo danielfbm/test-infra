@@ -66,3 +66,12 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s 
     wget https://github.com/kubernetes-sigs/kind/releases/download/v0.6.1/kind-linux-amd64 && \
     chmod +x kind-linux-amd64 && \
     mv kind-linux-amd64 /go/bin/kind
+
+ENV HELM_VERSION=2.16.0
+RUN curl -LO https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    tar -xvf helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    ls -lha && \
+    chmod +x linux-amd64/helm && \
+    rm helm-v${HELM_VERSION}-linux-amd64.tar.gz && \
+    mv linux-amd64/helm /usr/local/bin/helm && \
+    helm help
