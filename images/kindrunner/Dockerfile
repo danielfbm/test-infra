@@ -3,7 +3,7 @@ FROM docker:19.03-dind
 RUN apk add --no-cache \
                 ca-certificates
 
-ENV GOLANG_VERSION 1.13.5
+ENV GOLANG_VERSION 1.12.12
 
 RUN set -eux; \
         apk add --no-cache --virtual .build-deps \
