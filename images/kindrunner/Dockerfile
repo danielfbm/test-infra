@@ -3,7 +3,8 @@ FROM docker:19.03-dind
 RUN apk add --no-cache \
                 ca-certificates
 
-ENV GOLANG_VERSION 1.12.12
+ENV GOLANG_VERSION=1.13.5 \
+    GO_CHECK_SUM=512103d7ad296467814a6e3f635631bd35574cab3369a97a323c9a585ccaa569
 
 RUN set -eux; \
         apk add --no-cache --virtual .build-deps \
@@ -32,7 +33,7 @@ RUN set -eux; \
         esac; \
         \
         wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-        echo '6d7a5ba05476609a7614af3292f29c3be06327503c1f1fdc02ef417870fd6926 *go.tgz' | sha256sum -c -; \
+        echo "${GO_CHECK_SUM} *go.tgz" | sha256sum -c -; \
         tar -C /usr/local -xzf go.tgz; \
         rm go.tgz; \
         \
