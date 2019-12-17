@@ -4,7 +4,7 @@ RUN apk add --no-cache \
                 ca-certificates
 
 ENV GOLANG_VERSION=1.13.5 \
-    GO_CHECK_SUM=512103d7ad296467814a6e3f635631bd35574cab3369a97a323c9a585ccaa569
+    GO_CHECK_SUM=27d356e2a0b30d9983b60a788cf225da5f914066b37a6b4f69d457ba55a626ff
 
 RUN set -eux; \
         apk add --no-cache --virtual .build-deps \
